@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
   const [storedValue, setStoredValue] = useState<T>(initialValue)
-  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     try {
@@ -13,7 +12,6 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
     } catch (error) {
       console.warn(`Error reading localStorage key "${key}":`, error)
     }
-    setIsLoaded(true)
   }, [key])
 
   const setValue = (value: T | ((val: T) => T)) => {

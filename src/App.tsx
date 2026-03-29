@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Tool, Category, DEFAULT_CATEGORIES, DEFAULT_TOOLS } from './types'
 import Header from './components/Header'
 import Hero from './components/Hero'
@@ -29,18 +29,19 @@ function App() {
     })
   }, [tools, searchQuery, selectedCategories])
 
-  const handleAddTool = (tool: Omit<Tool, 'id' | 'addedAt'>) => {
-    const newTool: Tool = {
-      ...tool,
-      id: crypto.randomUUID(),
-      addedAt: new Date().toISOString(),
+  const handleSubmit = (tool: Tool | Omit<Tool, 'id' | 'addedAt'>) => {
+    if ('id' in tool && tool.id) {
+      // Edit existing tool
+      setTools(tools.map(t => t.id === tool.id ? tool as Tool : t))
+    } else {
+      // Add new tool
+      const newTool: Tool = {
+        ...(tool as Omit<Tool, 'id' | 'addedAt'>),
+        id: crypto.randomUUID(),
+        addedAt: new Date().toISOString(),
+      }
+      setTools([...tools, newTool])
     }
-    setTools([...tools, newTool])
-    setIsModalOpen(false)
-  }
-
-  const handleEditTool = (tool: Tool) => {
-    setTools(tools.map(t => t.id === tool.id ? tool : t))
     setEditingTool(null)
     setIsModalOpen(false)
   }
@@ -124,7 +125,7 @@ function App() {
           setIsModalOpen(false)
           setEditingTool(null)
         }}
-        onSubmit={editingTool ? handleEditTool : handleAddTool}
+        onSubmit={handleSubmit}
         categories={categories}
         editingTool={editingTool}
       />
